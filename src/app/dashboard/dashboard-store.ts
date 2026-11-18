@@ -1,4 +1,5 @@
-import { Injectable, signal } from '@angular/core';
+import { computed, DestroyRef, inject, Injectable, signal } from '@angular/core';
+import { IndexedDbWorkspace, RevisionConflict } from '../storage/indexed-db';
 import { WIDGETS } from '../widgets/widget-registry';
 import {
   firstFree,
@@ -16,21 +17,128 @@ import {
 import {
   createWidget,
   createWorkspace,
+  type Theme,
   type View,
+  type Widget,
   type WidgetType,
   type Workspace,
 } from './workspace';
 
+export type SaveState =
+  'ready' | 'loading' | 'saving' | 'saved' | 'read-error' | 'write-error' | 'conflict';
+
+function systemTheme(): Theme {
+  return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
 @Injectable({ providedIn: 'root' })
 export class DashboardStore {
-  private readonly model = signal(createWorkspace('light'));
-  readonly workspace = this.model.asReadonly();
+  private readonly storage = inject(IndexedDbWorkspace);
+  private readonly model = signal(createWorkspace(systemTheme()));
+  private readonly state = signal<SaveState>('ready');
+  private revision = 0;
+  private persisted = this.model();
+  private timer?: ReturnType<typeof setTimeout>;
+  private writing = false;
+  private destroyed = false;
 
-  restore(workspace: Workspace): void {
-    this.model.set(workspace);
+  readonly workspace = this.model.asReadonly();
+  readonly saveState = this.state.asReadonly();
+  readonly canEdit = computed(() => this.state() !== 'loading' && this.state() !== 'read-error');
+
+  constructor() {
+    inject(DestroyRef).onDestroy(() => {
+      this.destroyed = true;
+      this.clearTimer();
+    });
+  }
+
+  async load(): Promise<void> {
+    if (this.writing || this.state() === 'loading') return;
+    const wasConflict = this.state() === 'conflict';
+    this.clearTimer();
+    this.state.set('loading');
+    try {
+      const stored = await this.storage.read();
+      if (this.destroyed) return;
+      this.revision = stored?.revision ?? 0;
+      this.persisted = stored?.workspace ?? createWorkspace(systemTheme());
+      this.model.set(this.persisted);
+      this.state.set(stored ? 'saved' : 'ready');
+    } catch {
+      if (!this.destroyed) this.state.set(wasConflict ? 'conflict' : 'read-error');
+    }
+  }
+
+  setTheme(theme: Theme): void {
+    const current = this.model();
+    if (current.theme !== theme) this.change({ ...current, theme });
+  }
+
+  updateWidget(widget: Widget, debounce = false): void {
+    const current = this.model();
+    const previous = current.widgets.find((item) => item.id === widget.id);
+    if (!previous || previous.type !== widget.type || previous === widget) return;
+    this.change(
+      {
+        ...current,
+        widgets: current.widgets.map((item) => (item.id === widget.id ? widget : item)),
+      },
+      debounce,
+    );
+  }
+
+  async retrySave(): Promise<void> {
+    if (this.state() !== 'write-error') return;
+    this.state.set('saving');
+    await this.flush();
+  }
+
+  async flush(): Promise<void> {
+    this.clearTimer();
+    const snapshot = this.model();
+    if (
+      this.writing ||
+      this.destroyed ||
+      !this.canEdit() ||
+      snapshot === this.persisted ||
+      this.state() === 'conflict' ||
+      this.state() === 'write-error'
+    )
+      return;
+    this.writing = true;
+    this.state.set('saving');
+    try {
+      this.revision = await this.storage.write(snapshot, this.revision);
+      this.persisted = snapshot;
+      if (!this.destroyed && this.model() === snapshot) this.state.set('saved');
+    } catch (error) {
+      if (!this.destroyed)
+        this.state.set(error instanceof RevisionConflict ? 'conflict' : 'write-error');
+    } finally {
+      this.writing = false;
+      if (this.state() === 'saving' && this.timer === undefined && this.model() !== snapshot)
+        void this.flush();
+    }
+  }
+
+  private change(next: Workspace, debounce = false): void {
+    if (!this.canEdit()) return;
+    this.model.set(next);
+    if (this.state() === 'conflict' || this.state() === 'write-error') return;
+    this.state.set('saving');
+    this.clearTimer();
+    if (debounce) this.timer = setTimeout(() => void this.flush(), 250);
+    else void this.flush();
+  }
+
+  private clearTimer(): void {
+    clearTimeout(this.timer);
+    this.timer = undefined;
   }
 
   add(type: WidgetType): 'ok' | 'full' {
+    if (!this.canEdit()) return 'full';
     const current = this.model();
     const { start } = WIDGETS[type];
     const desktop = firstFree(start, Object.values(current.desktop), GRID.desktop);
@@ -51,11 +159,12 @@ export class DashboardStore {
       return 'full';
     }
 
-    this.model.set(next);
+    this.change(next);
     return 'ok';
   }
 
   place(id: string, view: View, rect: Placement): PlacementResult {
+    if (!this.canEdit()) return 'bounds';
     const current = this.model();
     const widget = current.widgets.find((item) => item.id === id);
     if (!widget) return 'bounds';
@@ -75,7 +184,7 @@ export class DashboardStore {
       previous.height === rect.height
     )
       return 'ok';
-    this.model.set({ ...current, [view]: { ...positions, [id]: rect } });
+    this.change({ ...current, [view]: { ...positions, [id]: rect } });
     return 'ok';
   }
 
@@ -85,7 +194,7 @@ export class DashboardStore {
     if (widgets.length === current.widgets.length) return;
     const without = (positions: Positions) =>
       Object.fromEntries(Object.entries(positions).filter(([key]) => key !== id));
-    this.model.set({
+    this.change({
       ...current,
       widgets,
       desktop: without(current.desktop),
@@ -94,9 +203,10 @@ export class DashboardStore {
   }
 
   resetLayout(): 'ok' | 'full' {
+    if (!this.canEdit()) return 'full';
     const next = resetLayout(this.model());
     if (!next) return 'full';
-    this.model.set(next);
+    this.change(next);
     return 'ok';
   }
 }

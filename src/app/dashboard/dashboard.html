@@ -1,35 +1,71 @@
 <header class="toolbar">
   <h1>DashForge</h1>
   <div class="actions">
-    <button type="button" (click)="message.set(''); catalog.showModal()">Add Widget</button>
-    <button type="button" (click)="editing.set(!editing())">
-      {{ editing() ? 'Done' : 'Edit Layout' }}
-    </button>
-    @if (editing()) {
-      <button type="button" (click)="reset()">Reset Layout</button>
+    @if (store.canEdit()) {
+      <button type="button" (click)="message.set(''); catalog.showModal()">Add Widget</button>
+      <button type="button" (click)="editing.set(!editing())">
+        {{ editing() ? 'Done' : 'Edit Layout' }}
+      </button>
+      <button
+        type="button"
+        (click)="store.setTheme(store.workspace().theme === 'dark' ? 'light' : 'dark')"
+      >
+        {{ store.workspace().theme === 'dark' ? 'Light theme' : 'Dark theme' }}
+      </button>
+      @if (editing()) {
+        <button type="button" (click)="reset()">Reset Layout</button>
+      }
     }
   </div>
 </header>
+<div class="save-status" role="status">
+  @switch (store.saveState()) {
+    @case ('loading') {
+      <span>Loading workspace…</span>
+    }
+    @case ('saving') {
+      <span>Saving…</span>
+    }
+    @case ('saved') {
+      <span>Saved</span>
+    }
+    @case ('write-error') {
+      <span>Changes could not be saved.</span>
+      <button type="button" (click)="store.retrySave()">Retry</button>
+    }
+    @case ('read-error') {
+      <span>The saved workspace could not be opened.</span>
+      <button type="button" (click)="store.load()">Retry</button>
+    }
+    @case ('conflict') {
+      <span>A newer workspace was saved in another tab.</span>
+      <p>Copy any unsaved text you want to keep before loading the saved workspace.</p>
+      <button type="button" (click)="reloadSaved()">Load saved workspace</button>
+    }
+  }
+</div>
 
 <main>
-  <p class="status" role="status">{{ message() }}</p>
-  <div class="board" [style.--columns]="columns()">
-    @for (widget of store.workspace().widgets; track widget.id) {
-      @let rect = positions()[widget.id];
-      <article
-        class="tile"
-        [attr.data-widget-id]="widget.id"
-        [attr.data-widget-type]="widget.type"
-        [style.grid-column]="rect.col + 1 + ' / span ' + rect.width"
-        [style.grid-row]="rect.row + 1 + ' / span ' + rect.height"
-      >
-        <h2>{{ widgets[widget.type].title }}</h2>
-        <button type="button" data-remove (click)="store.remove(widget.id)">Remove widget</button>
-      </article>
-    } @empty {
-      <p class="empty">Your workspace is empty. Add a widget to get started.</p>
-    }
-  </div>
+  @if (store.canEdit()) {
+    <p class="status" role="status">{{ message() }}</p>
+    <div class="board" [style.--columns]="columns()">
+      @for (widget of store.workspace().widgets; track widget.id) {
+        @let rect = positions()[widget.id];
+        <article
+          class="tile"
+          [attr.data-widget-id]="widget.id"
+          [attr.data-widget-type]="widget.type"
+          [style.grid-column]="rect.col + 1 + ' / span ' + rect.width"
+          [style.grid-row]="rect.row + 1 + ' / span ' + rect.height"
+        >
+          <h2>{{ widgets[widget.type].title }}</h2>
+          <button type="button" data-remove (click)="store.remove(widget.id)">Remove widget</button>
+        </article>
+      } @empty {
+        <p class="empty">Your workspace is empty. Add a widget to get started.</p>
+      }
+    </div>
+  }
 </main>
 
 <dialog #catalog aria-labelledby="catalog-title">

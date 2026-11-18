@@ -39,3 +39,41 @@ dialog {
 dialog::backdrop {
   background: rgb(0 0 0 / 35%);
 }
+
+:root {
+  color-scheme: light;
+  --canvas: #f2f1ee;
+  --surface: #fcfbf9;
+  --text: #222429;
+  --muted: #535760;
+  --border: #dad8d3;
+  --control-border: #818693;
+  --accent: #3f4fa8;
+  --focus: var(--accent);
+  --error: #9e2939;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --canvas: #17181b;
+  --surface: #23252a;
+  --text: #f2f2f4;
+  --muted: #b4bac5;
+  --border: #3b3f46;
+  --control-border: #828894;
+  --accent: #b6c1ff;
+  --error: #ffa7b2;
+}
+
+.save-status {
+  min-height: 1.25rem;
+  margin-bottom: 10px;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+.save-status p {
+  margin: 4px 0;
+}
+.save-status button {
+  margin-inline-start: 6px;
+}

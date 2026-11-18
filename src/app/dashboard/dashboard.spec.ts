@@ -1,11 +1,21 @@
 import { TestBed } from '@angular/core/testing';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { IndexedDbWorkspace } from '../storage/indexed-db';
 import { Dashboard } from './dashboard';
 import { DashboardStore } from './dashboard-store';
 import { createWorkspace } from './workspace';
 
 describe('Dashboard widget lifecycle', () => {
-  beforeEach(() => TestBed.configureTestingModule({ imports: [Dashboard] }));
+  const read = vi.fn().mockResolvedValue(null);
+  beforeEach(() => {
+    read.mockResolvedValue(null);
+    TestBed.configureTestingModule({
+      imports: [Dashboard],
+      providers: [
+        { provide: IndexedDbWorkspace, useValue: { read, write: vi.fn().mockResolvedValue(1) } },
+      ],
+    });
+  });
   afterEach(() => vi.restoreAllMocks());
 
   it('adds a second instance and removes only the selected widget', async () => {
@@ -38,7 +48,7 @@ describe('Dashboard widget lifecycle', () => {
     expect(store.workspace().desktop[clock]).toBeUndefined();
   });
 
-  it('rejects adding when the customized mobile grid has no room', () => {
+  it('rejects adding when the customized mobile grid has no room', async () => {
     const workspace = createWorkspace('light');
     const ids = workspace.widgets.map((widget) => widget.id);
     const initial = {
@@ -48,7 +58,8 @@ describe('Dashboard widget lifecycle', () => {
       ),
     };
     const store = TestBed.inject(DashboardStore);
-    store.restore(initial);
+    read.mockResolvedValue({ schemaVersion: 1, revision: 1, workspace: initial });
+    await store.load();
     expect(store.add('clock')).toBe('full');
     expect(store.workspace()).toBe(initial);
   });

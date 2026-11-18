@@ -39,6 +39,12 @@ export class Dashboard {
     if (catalog.open) catalog.close();
   }
 
+  protected reloadSaved(): void {
+    if (window.confirm('Load the saved workspace and discard unsaved changes in this tab?')) {
+      void this.store.load();
+    }
+  }
+
   protected reset(): void {
     if (window.confirm('Reset widget positions and sizes? Your content and theme will be kept.')) {
       const result = this.store.resetLayout();
