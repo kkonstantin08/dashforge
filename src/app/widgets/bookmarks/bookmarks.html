@@ -1,0 +1,73 @@
+@if (editing() !== null) {
+  <form class="widget-form" [formGroup]="form" (ngSubmit)="save()">
+    <label
+      >Title
+      <input
+        formControlName="title"
+        maxlength="160"
+        [attr.aria-invalid]="error() === 'title' ? 'true' : null"
+      />
+    </label>
+    @if (error() === 'title') {
+      <p class="widget-error" role="alert">Enter a title.</p>
+    }
+    <label
+      >URL
+      <input
+        type="url"
+        formControlName="url"
+        placeholder="https://example.com"
+        [attr.aria-invalid]="error() === 'url' ? 'true' : null"
+      />
+    </label>
+    @if (error() === 'url') {
+      <p class="widget-error" role="alert">Enter a valid URL starting with http:// or https://.</p>
+    }
+    <label>Group <input formControlName="group" maxlength="80" /></label>
+    <label
+      >Icon
+      <select formControlName="icon">
+        @for (icon of icons; track icon.value) {
+          <option [value]="icon.value">{{ icon.label }}</option>
+        }
+      </select>
+    </label>
+    <div class="buttons">
+      <button type="submit" class="primary">Save link</button>
+      <button type="button" (click)="cancel()">Cancel</button>
+    </div>
+  </form>
+} @else {
+  <button type="button" class="widget-action" (click)="begin()">Add link</button>
+}
+@for (entry of groups(); track entry[0]) {
+  <section class="group">
+    <h3>{{ entry[0] || 'Ungrouped' }}</h3>
+    <ul>
+      @for (link of entry[1]; track link.id) {
+        <li>
+          <a [href]="link.url" target="_blank" rel="noopener noreferrer">
+            <span class="glyph" aria-hidden="true">{{ glyph(link) }}</span>
+            <span class="label">{{ link.title }}</span>
+          </a>
+          <button
+            type="button"
+            class="link-action"
+            [attr.aria-label]="'Edit ' + link.title"
+            (click)="begin(link)"
+          >
+            Edit
+          </button>
+          <button
+            type="button"
+            class="link-action"
+            [attr.aria-label]="'Delete ' + link.title"
+            (click)="remove(link.id)"
+          >
+            Delete
+          </button>
+        </li>
+      }
+    </ul>
+  </section>
+}

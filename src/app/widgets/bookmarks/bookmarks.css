@@ -1,0 +1,55 @@
+.buttons,
+li,
+a {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.group {
+  margin-top: 10px;
+}
+h3 {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.875rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 4px 0 8px;
+}
+li {
+  padding-block: 3px;
+}
+a {
+  flex: 1 0 120px;
+  min-width: 0;
+  color: var(--text);
+  min-height: 32px;
+  flex-wrap: nowrap;
+}
+.label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.glyph {
+  width: 24px;
+  height: 24px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 6px;
+  background: var(--canvas);
+  color: var(--accent);
+  flex: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.link-action {
+  min-height: 32px;
+  padding: 3px 6px;
+  font-size: 0.8rem;
+}

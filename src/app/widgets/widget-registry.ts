@@ -46,4 +46,5 @@ export const WIDGET_LOADERS: Partial<
   Record<WidgetType, () => Promise<import('@angular/core').Type<unknown>>>
 > = {
   clock: () => import('./clock/clock').then(({ ClockWidget }) => ClockWidget),
+  bookmarks: () => import('./bookmarks/bookmarks').then(({ BookmarksWidget }) => BookmarksWidget),
 };
