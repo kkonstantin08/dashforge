@@ -47,4 +47,5 @@ export const WIDGET_LOADERS: Partial<
 > = {
   clock: () => import('./clock/clock').then(({ ClockWidget }) => ClockWidget),
   bookmarks: () => import('./bookmarks/bookmarks').then(({ BookmarksWidget }) => BookmarksWidget),
+  notes: () => import('./notes/notes').then(({ NotesWidget }) => NotesWidget),
 };

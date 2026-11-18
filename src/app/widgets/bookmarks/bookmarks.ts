@@ -85,7 +85,8 @@ export class BookmarksWidget {
     }
     const id = this.editing();
     const link = { id: id || crypto.randomUUID(), ...value, title, url, group: value.group.trim() };
-    const widget = this.widget();
+    const widget = this.store.getWidget(this.widget().id, 'bookmarks');
+    if (!widget) return;
     const links = id
       ? widget.data.links.map((item) => (item.id === id ? link : item))
       : [...widget.data.links, link];
@@ -94,7 +95,8 @@ export class BookmarksWidget {
   }
 
   protected remove(id: string): void {
-    const widget = this.widget();
+    const widget = this.store.getWidget(this.widget().id, 'bookmarks');
+    if (!widget) return;
     this.store.updateWidget({
       ...widget,
       data: { links: widget.data.links.filter((link) => link.id !== id) },

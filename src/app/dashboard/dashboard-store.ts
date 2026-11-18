@@ -75,6 +75,12 @@ export class DashboardStore {
     if (current.theme !== theme) this.change({ ...current, theme });
   }
 
+  getWidget<K extends WidgetType>(id: string, type: K): Extract<Widget, { type: K }> | undefined {
+    return this.model().widgets.find(
+      (item): item is Extract<Widget, { type: K }> => item.id === id && item.type === type,
+    );
+  }
+
   updateWidget(widget: Widget, debounce = false): void {
     const current = this.model();
     const previous = current.widgets.find((item) => item.id === widget.id);

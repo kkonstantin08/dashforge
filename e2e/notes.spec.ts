@@ -1,0 +1,30 @@
+import { expect, test } from '@playwright/test';
+
+test('restores multiline note text and deletes only the active note', async ({ page }) => {
+  await page.goto('/');
+  const widget = page.locator('[data-widget-type="notes"]');
+  await widget.getByRole('button', { name: 'New note' }).click();
+  const text = widget.getByRole('textbox', { name: 'Note text' });
+  await text.fill('First line\nSecond line');
+  await widget.getByRole('button', { name: 'New note' }).click();
+  await expect(widget.getByRole('combobox', { name: 'Notes' }).locator('option')).toHaveCount(2);
+  await expect(text).toHaveValue('');
+  await text.fill('Another note');
+  await expect(page.getByText('Saving…', { exact: true })).toBeVisible();
+  await expect(page.getByText('Saved', { exact: true })).toBeVisible();
+  await page.reload();
+  await expect(text).toHaveValue('Another note');
+  const selector = widget.getByRole('combobox', { name: 'Notes' });
+  await selector.selectOption({ label: 'First line' });
+  await expect(text).toHaveValue('First line\nSecond line');
+  const row = await widget.evaluate((el) => getComputedStyle(el).gridRowStart);
+  await page.getByRole('button', { name: 'Edit Layout' }).click();
+  await text.selectText();
+  await expect(widget).toHaveCSS('grid-row-start', row);
+  await widget.getByRole('button', { name: 'Delete note' }).click();
+  await expect(text).toHaveValue('Another note');
+  await expect(page.getByText('Saved', { exact: true })).toBeVisible();
+  await page.reload();
+  await expect(selector.locator('option')).toHaveCount(1);
+  await expect(text).toHaveValue('Another note');
+});
