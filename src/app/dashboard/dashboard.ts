@@ -78,6 +78,7 @@ export class Dashboard {
   protected close(fallback: HTMLElement): void {
     this.selectedId.set(null);
     const focusTarget = this.anchor?.isConnected ? this.anchor : fallback;
+    this.anchor = undefined;
     requestAnimationFrame(() => (focusTarget.isConnected ? focusTarget : fallback).focus());
   }
 

@@ -14,6 +14,7 @@ import type { Note, Widget } from '../../dashboard/workspace';
 
 @Component({
   selector: 'app-notes-widget',
+  host: { '[class.in-panel]': 'settings()' },
   template: `
     <div class="note-actions">
       <button type="button" (click)="add()">New note</button>

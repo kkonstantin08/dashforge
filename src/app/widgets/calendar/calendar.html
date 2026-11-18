@@ -88,8 +88,8 @@
           <ul>
             @for (event of upcoming(); track event.id) {
               <li class="upcoming-event">
-                <span>{{ event.title }}</span
-                ><small>{{ eventDate(event) }}</small>
+                <div>{{ event.title }}</div>
+                <small>{{ eventDate(event) }}</small>
               </li>
             }
           </ul>

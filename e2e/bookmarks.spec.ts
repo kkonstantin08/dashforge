@@ -11,7 +11,7 @@ async function addLink(widget: Locator, title: string, group: string) {
 test('creates, edits and deletes grouped bookmarks without fetching favicons', async ({
   page,
   context,
-}) => {
+}, testInfo) => {
   const external: string[] = [];
   page.on('request', (request) => {
     if (!request.url().startsWith('http://127.0.0.1:4173/')) external.push(request.url());
@@ -25,6 +25,12 @@ test('creates, edits and deletes grouped bookmarks without fetching favicons', a
   await addLink(widget, 'Reading', 'Personal');
   await expect(widget.getByRole('heading', { name: 'Work' })).toBeVisible();
   await expect(widget.getByRole('heading', { name: 'Personal' })).toBeVisible();
+  if (testInfo.project.name === 'chromium') {
+    await widget.locator('.content').evaluate((element) => {
+      element.scrollTop = 0;
+    });
+    await expect(widget.getByRole('link', { name: 'Docs' })).toBeInViewport({ ratio: 1 });
+  }
   const link = widget.getByRole('link', { name: 'Docs', exact: true });
   await expect(link).toHaveAttribute('target', '_blank');
   await expect(link).toHaveAttribute('rel', 'noopener noreferrer');

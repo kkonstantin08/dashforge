@@ -140,6 +140,7 @@ test('keeps a widget settings draft while dragging on the visible desktop canvas
   const card = clock(page);
   await card.getByRole('button', { name: 'Clock settings' }).click();
   const panel = page.getByRole('dialog', { name: 'Clock settings' });
+  await page.getByRole('button', { name: 'Done' }).click({ trial: true, timeout: 2000 });
   const zone = panel.getByLabel('Time zone', { exact: true });
   await zone.fill('UTC');
   await dragBy(page, card.getByRole('button', { name: 'Move Clock' }), 0, 480);

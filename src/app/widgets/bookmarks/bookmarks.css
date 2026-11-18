@@ -53,3 +53,29 @@ a {
   padding: 3px 6px;
   font-size: 0.8rem;
 }
+
+.compact {
+  position: relative;
+}
+.compact .widget-action {
+  position: absolute;
+  inset: 0 0 auto auto;
+  min-height: 28px;
+  padding: 2px 8px;
+  font-size: 0.8125rem;
+}
+.compact .group:first-of-type {
+  margin-top: 0;
+}
+.compact .group:first-of-type h3 {
+  display: flex;
+  align-items: center;
+  min-height: 28px;
+  padding-inline-end: 84px;
+}
+.compact ul {
+  margin-top: 0;
+}
+.compact li {
+  padding-block: 0;
+}
