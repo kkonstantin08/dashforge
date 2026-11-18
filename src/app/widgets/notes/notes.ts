@@ -50,6 +50,11 @@ import type { Note, Widget } from '../../dashboard/workspace';
       max-width: 100%;
       min-width: 0;
     }
+    :host(:not(.in-panel)) .note-actions > * {
+      min-height: 32px;
+      padding-block: 3px;
+      font-size: 0.875rem;
+    }
     textarea {
       display: block;
       width: 100%;

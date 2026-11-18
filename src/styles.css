@@ -113,3 +113,8 @@ select {
 [aria-invalid='true'] {
   border-color: var(--error);
 }
+input::placeholder,
+textarea::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
