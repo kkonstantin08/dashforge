@@ -1,1 +1,41 @@
-/* You can add global styles to this file, and also import other style files */
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--canvas, #f2f1ee);
+  color: var(--text, #222429);
+  font:
+    1rem/1.5 system-ui,
+    sans-serif;
+}
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+button {
+  min-height: 44px;
+  padding: 6px 12px;
+  border: 1px solid var(--control-border, #818693);
+  border-radius: 8px;
+  background: var(--surface, #fcfbf9);
+  cursor: pointer;
+}
+:focus-visible {
+  outline: 2px solid var(--focus, #3f4fa8);
+  outline-offset: 2px;
+}
+dialog {
+  max-width: min(32rem, calc(100% - 24px));
+  border: 1px solid var(--border, #dad8d3);
+  border-radius: 16px;
+  padding: 16px;
+  color: var(--text, #222429);
+  background: var(--surface, #fcfbf9);
+}
+dialog::backdrop {
+  background: rgb(0 0 0 / 35%);
+}

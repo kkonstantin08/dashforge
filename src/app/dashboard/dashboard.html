@@ -1,0 +1,54 @@
+<header class="toolbar">
+  <h1>DashForge</h1>
+  <div class="actions">
+    <button type="button" (click)="message.set(''); catalog.showModal()">Add Widget</button>
+    <button type="button" (click)="editing.set(!editing())">
+      {{ editing() ? 'Done' : 'Edit Layout' }}
+    </button>
+    @if (editing()) {
+      <button type="button" (click)="reset()">Reset Layout</button>
+    }
+  </div>
+</header>
+
+<main>
+  <p class="status" role="status">{{ message() }}</p>
+  <div class="board" [style.--columns]="columns()">
+    @for (widget of store.workspace().widgets; track widget.id) {
+      @let rect = positions()[widget.id];
+      <article
+        class="tile"
+        [attr.data-widget-id]="widget.id"
+        [attr.data-widget-type]="widget.type"
+        [style.grid-column]="rect.col + 1 + ' / span ' + rect.width"
+        [style.grid-row]="rect.row + 1 + ' / span ' + rect.height"
+      >
+        <h2>{{ widgets[widget.type].title }}</h2>
+        <button type="button" data-remove (click)="store.remove(widget.id)">Remove widget</button>
+      </article>
+    } @empty {
+      <p class="empty">Your workspace is empty. Add a widget to get started.</p>
+    }
+  </div>
+</main>
+
+<dialog #catalog aria-labelledby="catalog-title">
+  <div class="dialog-header">
+    <h2 id="catalog-title">Add a widget</h2>
+    <button type="button" (click)="catalog.close()">Close</button>
+  </div>
+  <div class="catalog">
+    @for (type of types; track type) {
+      <button
+        type="button"
+        class="catalog-item"
+        [attr.data-add]="type"
+        (click)="add(type, catalog)"
+      >
+        <strong>{{ widgets[type].title }}</strong>
+        <span>{{ widgets[type].description }}</span>
+      </button>
+    }
+  </div>
+  <p class="status" role="status">{{ message() }}</p>
+</dialog>
