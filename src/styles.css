@@ -92,3 +92,24 @@ select {
   color: var(--accent);
   font-weight: 600;
 }
+
+.widget-form {
+  display: grid;
+  gap: 8px;
+}
+.widget-form label {
+  display: grid;
+  gap: 4px;
+}
+.widget-form input,
+.widget-form select {
+  min-width: 0;
+  width: 100%;
+}
+.widget-error {
+  color: var(--error);
+  margin: 0;
+}
+[aria-invalid='true'] {
+  border-color: var(--error);
+}

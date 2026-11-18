@@ -74,7 +74,7 @@ test('uses the inspector with the keyboard and keeps the mobile layout separate'
   await expect(panel).toHaveAttribute('aria-modal', 'true');
   await panel.getByLabel('Width', { exact: true }).fill('1');
   await panel.getByRole('button', { name: 'Apply' }).click();
-  await expect(panel.getByRole('alert')).toContainText('Minimum');
+  await expect(panel.getByRole('alert').filter({ hasText: 'Minimum' })).toBeVisible();
   await panel.getByLabel('Width', { exact: true }).fill('2');
   await panel.getByRole('button', { name: 'Apply' }).click();
   await expect(clock(page)).toHaveCSS('grid-column-end', 'span 2');
@@ -129,4 +129,21 @@ test('removes only the configured widget through the inspector', async ({ page }
   await expect(page.getByText('Saved', { exact: true })).toBeVisible();
   await page.reload();
   await expect(notes).toHaveCount(1);
+});
+
+test('keeps a widget settings draft while dragging on the visible desktop canvas', async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== 'chromium');
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Edit Layout' }).click();
+  const card = clock(page);
+  await card.getByRole('button', { name: 'Clock settings' }).click();
+  const panel = page.getByRole('dialog', { name: 'Clock settings' });
+  const zone = panel.getByLabel('Time zone', { exact: true });
+  await zone.fill('UTC');
+  await dragBy(page, card.getByRole('button', { name: 'Move Clock' }), 0, 480);
+  await page.mouse.up();
+  await expect(panel.getByLabel('Row', { exact: true })).toHaveValue('9');
+  await expect(zone).toHaveValue('UTC');
 });

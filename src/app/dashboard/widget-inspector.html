@@ -8,7 +8,7 @@
     <h2 id="widget-settings-title">{{ title() }}</h2>
     <button type="button" (click)="dismiss()">Close</button>
   </div>
-  <ng-content />
+  <app-widget-content [widget]="widget()" [settings]="true" />
   <form [formGroup]="form" (ngSubmit)="submit()">
     <fieldset>
       <legend>Position and size</legend>

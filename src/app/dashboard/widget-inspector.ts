@@ -11,6 +11,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { WidgetContent } from '../widgets/widget-content';
 import { WIDGETS } from '../widgets/widget-registry';
 import { PLACEMENT_ERRORS } from './grid-gesture';
 import { validatePlacement, type Limits, type Placement } from './layout';
@@ -18,7 +19,7 @@ import type { View, Widget } from './workspace';
 
 @Component({
   selector: 'app-widget-inspector',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, WidgetContent],
   templateUrl: './widget-inspector.html',
   styleUrl: './widget-inspector.css',
   host: { '(keydown.escape)': 'dismiss($event)' },

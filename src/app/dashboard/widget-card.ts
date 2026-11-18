@@ -1,11 +1,12 @@
 import { CdkDragHandle } from '@angular/cdk/drag-drop';
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { WidgetContent } from '../widgets/widget-content';
 import { WIDGETS } from '../widgets/widget-registry';
 import type { Widget } from './workspace';
 
 @Component({
   selector: 'article[app-widget-card]',
-  imports: [CdkDragHandle],
+  imports: [CdkDragHandle, WidgetContent],
   template: `
     <header>
       @if (editing()) {
@@ -31,7 +32,7 @@ import type { Widget } from './workspace';
         ⋯
       </button>
     </header>
-    <div class="content"><ng-content /></div>
+    <div class="content"><app-widget-content [widget]="widget()" /></div>
     @if (editing()) {
       <button
         type="button"
