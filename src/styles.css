@@ -77,3 +77,18 @@ dialog::backdrop {
 .save-status button {
   margin-inline-start: 6px;
 }
+
+input,
+textarea,
+select {
+  border: 1px solid var(--control-border);
+  background: var(--surface);
+  border-radius: 8px;
+  padding: 6px 8px;
+  min-height: 44px;
+}
+.primary {
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}

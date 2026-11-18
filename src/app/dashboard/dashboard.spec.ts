@@ -29,8 +29,7 @@ describe('Dashboard widget lifecycle', () => {
     const notes = store.workspace().widgets.filter((widget) => widget.type === 'notes');
     expect(notes).toHaveLength(2);
     expect(notes[0].id).not.toBe(notes[1].id);
-    const created = root.querySelector(`[data-widget-id="${notes[1].id}"]`);
-    created?.querySelector<HTMLButtonElement>('[data-remove]')?.click();
+    store.remove(notes[1].id);
     await fixture.whenStable();
     expect(root.querySelectorAll('[data-widget-id]')).toHaveLength(4);
     expect(store.workspace().widgets).toContain(notes[0]);

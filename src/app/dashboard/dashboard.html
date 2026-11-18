@@ -1,9 +1,11 @@
 <header class="toolbar">
-  <h1>DashForge</h1>
+  <h1 #toolbarTitle tabindex="-1">DashForge</h1>
   <div class="actions">
     @if (store.canEdit()) {
-      <button type="button" (click)="message.set(''); catalog.showModal()">Add Widget</button>
-      <button type="button" (click)="editing.set(!editing())">
+      <button type="button" class="primary" (click)="message.set(''); catalog.showModal()">
+        Add Widget
+      </button>
+      <button type="button" (click)="toggleEditor()">
         {{ editing() ? 'Done' : 'Edit Layout' }}
       </button>
       <button
@@ -48,23 +50,48 @@
 <main>
   @if (store.canEdit()) {
     <p class="status" role="status">{{ message() }}</p>
-    <div class="board" [style.--columns]="columns()">
+    <div
+      #board
+      class="board"
+      [class.editing]="editing()"
+      [style.--columns]="columns()"
+      [style.grid-template-rows]="editing() ? 'repeat(' + editRows() + ', 48px)' : null"
+    >
       @for (widget of store.workspace().widgets; track widget.id) {
         @let rect = positions()[widget.id];
         <article
-          class="tile"
+          app-widget-card
+          cdkDrag
+          [widget]="widget"
+          [editing]="editing()"
+          [cdkDragDisabled]="!editing()"
+          [class.selected]="selectedId() === widget.id"
           [attr.data-widget-id]="widget.id"
           [attr.data-widget-type]="widget.type"
           [style.grid-column]="rect.col + 1 + ' / span ' + rect.width"
           [style.grid-row]="rect.row + 1 + ' / span ' + rect.height"
-        >
-          <h2>{{ widgets[widget.type].title }}</h2>
-          <button type="button" data-remove (click)="store.remove(widget.id)">Remove widget</button>
-        </article>
+          (cdkDragStarted)="startDrag(widget, $event, board, preview)"
+          (cdkDragEnded)="endDrag($event)"
+          (resized)="startResize(widget, $event, board, preview)"
+          (inspected)="select(widget, $event)"
+        ></article>
       } @empty {
         <p class="empty">Your workspace is empty. Add a widget to get started.</p>
       }
+      <div #preview class="placement-preview" aria-hidden="true" hidden></div>
     </div>
+    @if (selected(); as widget) {
+      <app-widget-inspector
+        [widget]="widget"
+        [rect]="positions()[widget.id]"
+        [view]="view()"
+        [limits]="limits(widget.type, view())"
+        [occupied]="selectedNeighbors()"
+        (placement)="place(widget.id, $event)"
+        (removed)="remove(widget.id, toolbarTitle)"
+        (closed)="close(toolbarTitle)"
+      />
+    }
   }
 </main>
 

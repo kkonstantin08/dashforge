@@ -1,0 +1,28 @@
+<dialog
+  #panel
+  aria-labelledby="widget-settings-title"
+  [attr.aria-modal]="view() === 'mobile' ? 'true' : null"
+  (cancel)="dismiss($event)"
+>
+  <div class="heading">
+    <h2 id="widget-settings-title">{{ title() }}</h2>
+    <button type="button" (click)="dismiss()">Close</button>
+  </div>
+  <ng-content />
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <fieldset>
+      <legend>Position and size</legend>
+      <div class="geometry">
+        <label>Column<input type="number" inputmode="numeric" formControlName="col" /></label>
+        <label>Row<input type="number" inputmode="numeric" formControlName="row" /></label>
+        <label>Width<input type="number" inputmode="numeric" formControlName="width" /></label>
+        <label>Height<input type="number" inputmode="numeric" formControlName="height" /></label>
+      </div>
+    </fieldset>
+    <p class="error" role="alert">{{ error() }}</p>
+    <div class="footer">
+      <button type="submit" class="primary">Apply</button>
+      <button type="button" data-remove (click)="removed.emit()">Remove widget</button>
+    </div>
+  </form>
+</dialog>
