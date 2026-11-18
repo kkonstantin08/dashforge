@@ -29,7 +29,20 @@
           },
           "configurations": {
             "production": {
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "255kB",
+                  "maximumError": "275kB"
+                },
+                {
+                  "type": "bundle",
+                  "name": "styles",
+                  "maximumWarning": "3kB",
+                  "maximumError": "5kB"
+                }
+              ]
             },
             "development": {
               "optimization": false,
