@@ -42,10 +42,12 @@ export const WIDGETS = {
 
 export const WIDGET_TYPES = Object.keys(WIDGETS) as WidgetType[];
 
-export const WIDGET_LOADERS: Partial<
-  Record<WidgetType, () => Promise<import('@angular/core').Type<unknown>>>
+export const WIDGET_LOADERS: Record<
+  WidgetType,
+  () => Promise<import('@angular/core').Type<unknown>>
 > = {
   clock: () => import('./clock/clock').then(({ ClockWidget }) => ClockWidget),
   bookmarks: () => import('./bookmarks/bookmarks').then(({ BookmarksWidget }) => BookmarksWidget),
   notes: () => import('./notes/notes').then(({ NotesWidget }) => NotesWidget),
+  calendar: () => import('./calendar/calendar').then(({ CalendarWidget }) => CalendarWidget),
 };

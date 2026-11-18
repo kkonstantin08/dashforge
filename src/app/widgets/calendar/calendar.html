@@ -1,0 +1,102 @@
+<div class="calendar">
+  <section aria-label="Month">
+    <div class="month-bar">
+      <button
+        type="button"
+        aria-label="Previous month"
+        title="Previous month"
+        (click)="shiftMonth(-1)"
+      >
+        ‹
+      </button>
+      <h3>{{ shown() }}</h3>
+      <button type="button" aria-label="Next month" title="Next month" (click)="shiftMonth(1)">
+        ›
+      </button>
+    </div>
+    <div class="calendar-grid">
+      @for (day of weekdays; track day) {
+        <span class="weekday">{{ day }}</span>
+      }
+      @for (day of days(); track $index) {
+        @if (day) {
+          <button
+            type="button"
+            [attr.aria-label]="day"
+            [attr.aria-pressed]="day === selected()"
+            [attr.aria-current]="day === today() ? 'date' : null"
+            (click)="choose(day)"
+          >
+            {{ +day.slice(-2) }}
+          </button>
+        } @else {
+          <span aria-hidden="true"></span>
+        }
+      }
+    </div>
+  </section>
+  <div class="agenda">
+    <section aria-label="Selected day">
+      <h3>{{ selectedLabel() }}</h3>
+      @if (editing() !== null) {
+        <form class="widget-form" [formGroup]="form" (ngSubmit)="save()">
+          <label>Title<input formControlName="title" maxlength="160" /></label>
+          <label>Date<input type="date" formControlName="date" /></label>
+          <label>Time<input type="time" formControlName="time" /></label>
+          <p class="widget-error" role="alert">{{ error() }}</p>
+          <div class="buttons">
+            <button type="submit" class="primary">Save event</button>
+            <button type="button" (click)="cancel()">Cancel</button>
+          </div>
+        </form>
+      } @else {
+        <button type="button" (click)="begin()">Add event</button>
+      }
+      @if (dayEvents().length) {
+        <ul>
+          @for (event of dayEvents(); track event.id) {
+            <li>
+              <span
+                >{{ event.title }}
+                @if (event.time) {
+                  <small>{{ event.time }}</small>
+                }
+              </span>
+              <button
+                type="button"
+                [attr.aria-label]="'Edit ' + event.title"
+                (click)="begin(event)"
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                [attr.aria-label]="'Delete ' + event.title"
+                (click)="remove(event.id)"
+              >
+                Delete
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+    @if (!settings()) {
+      <section aria-label="Upcoming events">
+        <h3>Upcoming events</h3>
+        @if (upcoming().length) {
+          <ul>
+            @for (event of upcoming(); track event.id) {
+              <li class="upcoming-event">
+                <span>{{ event.title }}</span
+                ><small>{{ eventDate(event) }}</small>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="empty">No upcoming events.</p>
+        }
+      </section>
+    }
+  </div>
+</div>

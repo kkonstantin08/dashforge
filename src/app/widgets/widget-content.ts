@@ -39,7 +39,6 @@ export class WidgetContent {
       const load = WIDGET_LOADERS[this.type()];
       this.component.set(null);
       this.failed.set(false);
-      if (!load) return;
       let active = true;
       onCleanup(() => {
         active = false;
