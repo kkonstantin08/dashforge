@@ -36,7 +36,7 @@
 
 ## Этап C · репозиторий и реализация
 
-### C1. Репозиторий и сборка
+### Task 1: C1. Репозиторий и сборка
 
 **Файлы:** `.gitignore`, `package.json`, lockfile, `angular.json`, `tsconfig*.json`, ESLint и Prettier config, `playwright.config.ts`, `.github/workflows/ci.yml`, `LICENSE`.
 
@@ -45,7 +45,7 @@
 - [ ] Настроить GitHub Actions на push и pull_request с lint, format check, typecheck, unit и build. Включить `.gitignore` для `.env*`, `node_modules`, сборок и отчётов тестов. Заполнить MIT лицензией с согласованным именем автора. Перед push проверить отслеживаемые файлы и историю на секреты и персональные данные, включая Git author email. Для публичной истории использовать адрес no-reply, если личный адрес не согласован.
 - [ ] Прогнать все команды из AGENTS.md, сделать `chore: configure Angular build and CI`. Создать отдельный публичный репозиторий `dashforge` под проверенным аккаунтом, сделать первый push и дождаться зелёной CI. При занятом имени сохранить локальный прогресс и согласовать замену.
 
-### C2. Сетка и жизненный цикл
+### Task 2: C2. Сетка и жизненный цикл
 
 **Файлы:** `src/app/dashboard/layout.ts`, `layout.spec.ts`, `dashboard.ts`, `dashboard.spec.ts`, `dashboard-store.ts`, `src/app/widgets/widget-registry.ts`.
 
@@ -55,7 +55,7 @@
 - [ ] **GREEN.** Создать валидатор и детерминированное размещение, стартовый workspace, каталог, каркас CSS Grid и рабочие кнопки добавления, удаления, сброса. Прогнать ту же команду.
 - [ ] **REFACTOR.** Сверить единый путь валидации и отсутствие дублирования правил между раскладками. Записать `docs/tdd/layout.md`, коммит `feat(layout): add free grid and widget lifecycle`. Закрывает L1 и правила границ L2.
 
-### C3. IndexedDB и тема
+### Task 3: C3. IndexedDB и тема
 
 **Файлы:** `src/app/storage/indexed-db.ts`, `indexed-db.spec.ts`, `src/app/dashboard/dashboard-store.ts`, `dashboard-store.spec.ts`, `src/app/app.ts`, `app.spec.ts`, `src/styles.css`, `e2e/persistence.spec.ts`.
 
@@ -65,7 +65,7 @@
 - [ ] **GREEN.** Хранилище одним readwrite, проверка снимка и ревизии, очередь сохранения, видимые состояния и переключатель темы. Проверку транзакций покрыть браузером, очередь и состояния тестировать через управляемый адаптер. Прогнать те же наборы.
 - [ ] **REFACTOR.** Сверить, что автосохранение всегда использует одну очередь и статус `Saved` означает commit. Записать `docs/tdd/storage.md`, коммит `feat(storage): persist workspace and theme in IndexedDB`. Закрывает P1, P2, V1.
 
-### C4. Редактор, drag, resize и панель
+### Task 4: C4. Редактор, drag, resize и панель
 
 **Файлы:** `src/app/dashboard/grid-gesture.ts`, `grid-gesture.spec.ts`, `widget-card.ts`, `widget-inspector.ts`, `widget-inspector.spec.ts`, `e2e/layout.spec.ts`, `e2e/mobile-layout.spec.ts`.
 
@@ -75,7 +75,7 @@
 - [ ] **GREEN.** Привязать Angular CDK к ручке drag, Pointer Events к отдельной ручке resize и оба пути к общей проверке. Добавить контур, очистку и панель точных параметров. Проверить использование реального ввода touch в Chromium, например через CDP. Прогнать те же наборы.
 - [ ] **REFACTOR.** Убедиться, что move-кадры не записывают workspace, resize не начинает drag и listeners снимаются по всем исходам. Записать `docs/tdd/editor.md`, коммит `feat(editor): add widget movement resizing and inspector`. Закрывает L2, L3, L4.
 
-### C5. Clock
+### Task 5: C5. Clock
 
 **Файлы:** `src/app/widgets/clock/clock.ts`, `minute-clock.ts`, `clock.spec.ts`, реестр и панели настройки, `e2e/clock.spec.ts`.
 
@@ -83,7 +83,7 @@
 - [ ] **GREEN.** Добавить ленивый standalone виджет и общий минутный источник. Прогнать выбранные unit и E2E.
 - [ ] **REFACTOR.** Проверить единственный таймер и стабильность форматтеров. Записать `docs/tdd/clock.md`, коммит `feat(widgets): add configurable clock`. Закрывает W1.
 
-### C6. Bookmarks
+### Task 6: C6. Bookmarks
 
 **Файлы:** `src/app/widgets/bookmarks/bookmarks.ts`, `bookmarks.spec.ts`, реестр и панель, `e2e/bookmarks.spec.ts`.
 
@@ -91,7 +91,7 @@
 - [ ] **GREEN.** Добавить CRUD, группировку и локальный выбор иконки, типизированную форму и валидацию при загрузке снимка. Прогнать выбранные unit и E2E.
 - [ ] **REFACTOR.** Оставить одну URL-валидацию для формы и чтения снимка. Записать `docs/tdd/bookmarks.md`, коммит `feat(widgets): add grouped bookmarks`. Закрывает W2.
 
-### C7. Notes
+### Task 7: C7. Notes
 
 **Файлы:** `src/app/widgets/notes/notes.ts`, `notes.spec.ts`, реестр, `e2e/notes.spec.ts`.
 
@@ -99,7 +99,7 @@
 - [ ] **GREEN.** Простая форма ввода текста с общей очередью, переключение заметок, удаление и пустое состояние. Прогнать выбранные unit и E2E.
 - [ ] **REFACTOR.** Проверить, что запись текста не меняет модели других карточек. Записать `docs/tdd/notes.md`, коммит `feat(widgets): add local notes with autosave`. Закрывает W3.
 
-### C8. Calendar
+### Task 8: C8. Calendar
 
 **Файлы:** `src/app/widgets/calendar/calendar.ts`, `calendar-dates.ts`, `calendar.spec.ts`, реестр и панель, `e2e/calendar.spec.ts`.
 
