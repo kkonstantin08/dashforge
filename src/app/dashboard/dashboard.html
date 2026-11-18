@@ -81,16 +81,18 @@
       <div #preview class="placement-preview" aria-hidden="true" hidden></div>
     </div>
     @if (selected(); as widget) {
-      <app-widget-inspector
-        [widget]="widget"
-        [rect]="positions()[widget.id]"
-        [view]="view()"
-        [limits]="limits(widget.type, view())"
-        [occupied]="selectedNeighbors()"
-        (placement)="place(widget.id, $event)"
-        (removed)="remove(widget.id, toolbarTitle)"
-        (closed)="close(toolbarTitle)"
-      />
+      @defer (on immediate) {
+        <app-widget-inspector
+          [widget]="widget"
+          [rect]="positions()[widget.id]"
+          [view]="view()"
+          [limits]="limits(widget.type, view())"
+          [occupied]="selectedNeighbors()"
+          (placement)="place(widget.id, $event)"
+          (removed)="remove(widget.id, toolbarTitle)"
+          (closed)="close(toolbarTitle)"
+        />
+      }
     }
   }
 </main>
