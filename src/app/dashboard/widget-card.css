@@ -15,6 +15,9 @@
 :host(.selected) {
   border-color: var(--accent);
 }
+:host([data-widget-type='clock']) {
+  padding-block-end: min(10px, var(--tile-padding));
+}
 :host(.cdk-drag-dragging) {
   z-index: 2;
 }
@@ -22,7 +25,7 @@
   transform: none !important;
 }
 header {
-  margin: -9px -9px var(--widget-gap);
+  margin: -9px -9px calc(var(--widget-gap) / 2);
   padding-left: 9px;
   display: flex;
   gap: 2px;

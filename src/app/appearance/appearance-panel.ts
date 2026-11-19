@@ -37,6 +37,7 @@ type InvalidColors = Partial<Record<Theme, Partial<Palette>>>;
   templateUrl: './appearance-panel.html',
   styleUrl: './appearance-panel.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { '(keydown)': 'cycleFocus($event)' },
 })
 export class AppearancePanel {
   private readonly store = inject(DashboardStore);
@@ -163,6 +164,19 @@ export class AppearancePanel {
     if (this.invalid() || this.uploading()) return;
     this.store.applyAppearance(this.theme(), this.appearance(), this.additions);
     this.dismiss();
+  }
+
+  protected cycleFocus(event: KeyboardEvent): void {
+    if (event.key !== 'Tab' || event.altKey || event.ctrlKey || event.metaKey) return;
+    const dialog = this.dialog().nativeElement;
+    const controls = dialog.querySelectorAll<HTMLElement>(
+      'button:enabled, input:enabled:not([hidden]), select:enabled',
+    );
+    const first = controls.item(0);
+    const last = controls.item(controls.length - 1);
+    if (dialog.ownerDocument.activeElement !== (event.shiftKey ? first : last)) return;
+    event.preventDefault();
+    (event.shiftKey ? last : first)?.focus();
   }
 
   protected dismiss(event?: Event): void {

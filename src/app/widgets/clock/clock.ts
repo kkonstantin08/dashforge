@@ -61,7 +61,7 @@ import { formatClock, MinuteClock } from './minute-clock';
       gap: 2px 12px;
     }
     .clock-time {
-      font: 500 clamp(1.5rem, 10cqi, 3.5rem)/1 var(--heading-font);
+      font: 500 clamp(1.5rem, 9cqi, 3.5rem)/1 var(--heading-font);
       letter-spacing: -0.045em;
       font-variant-numeric: tabular-nums;
       white-space: nowrap;

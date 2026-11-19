@@ -79,6 +79,7 @@ dialog::backdrop {
   --canvas-accent: #98492e;
   --canvas-on-accent: #fff;
   --grid-line: #d9d0c3;
+  --grid-control: #89796c;
   --focus: var(--accent);
   --error: #9b3030;
   --tile-radius: 18px;
@@ -100,6 +101,7 @@ dialog::backdrop {
 }
 
 .save-status {
+  --focus: var(--canvas-accent);
   min-height: 1.25rem;
   margin-bottom: 10px;
   font-size: 0.875rem;

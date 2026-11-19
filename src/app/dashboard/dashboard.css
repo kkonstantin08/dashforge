@@ -82,9 +82,12 @@ main {
 }
 .board.editing {
   background-image:
-    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+    linear-gradient(to right, var(--grid-control) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-control) 1px, transparent 1px);
   background-size: calc((100% + 12px) / var(--columns)) 60px;
+}
+.board.editing > article:not(.selected) {
+  border-color: var(--control-border);
 }
 .placement-preview {
   position: absolute;

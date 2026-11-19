@@ -100,6 +100,7 @@ export class AppearancePreview {
       '--canvas-accent': canvas.accent,
       '--canvas-on-accent': canvas.onAccent,
       '--grid-line': canvas.border,
+      '--grid-control': canvas.control,
       '--tile-radius': `${appearance.radius}px`,
       '--heading-font': fontStack(appearance.headings, 'Lora, Georgia, serif'),
       '--body-font': fontStack(appearance.body, 'system-ui, sans-serif'),

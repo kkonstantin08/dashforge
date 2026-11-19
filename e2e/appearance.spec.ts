@@ -133,3 +133,63 @@ test('fits the appearance dialog across supported widths and discards a cancelle
   await expect(headings).toHaveValue('lora');
   await expect(headings.getByRole('option', { name: 'lora-latin.woff2' })).toHaveCount(0);
 });
+
+test('cycles keyboard focus in the panel and draws usable outlines on opposite surfaces', async ({
+  page,
+}) => {
+  await page.goto('/');
+  const opener = page.getByRole('button', { name: 'Appearance', exact: true });
+  await opener.click();
+  const panel = page.getByRole('dialog', { name: 'Appearance', exact: true });
+  const light = panel.getByRole('button', { name: 'Light', exact: true });
+  const apply = panel.getByRole('button', { name: 'Apply', exact: true });
+  await apply.focus();
+  await page.keyboard.press('Tab');
+  await expect(light).toBeFocused();
+  await page.keyboard.press('Shift+Tab');
+  await expect(apply).toBeFocused();
+
+  await light.click();
+  await panel.getByLabel('Background HEX').fill('#000000');
+  await panel.getByLabel('Cards HEX').fill('#FFFFFF');
+  await panel.getByLabel('Accent HEX').fill('#000000');
+  await apply.click();
+  await expect(panel).toBeHidden();
+  await page.keyboard.press('Tab');
+  await opener.focus();
+  await expect(opener).not.toHaveCSS('outline-color', 'rgb(0, 0, 0)');
+  const cardButton = page.getByRole('button', { name: 'Clock settings' });
+  await cardButton.focus();
+  await expect(cardButton).toHaveCSS('outline-color', 'rgb(0, 0, 0)');
+});
+
+test('the default clock fits inside its card content', async ({ page }) => {
+  await page.goto('/');
+  const clock = page.locator('[data-widget-type="clock"]');
+  await expect(clock.locator('.clock-time')).toBeVisible();
+  await page.evaluate(() => document.fonts.ready.then(() => true));
+  const content = clock.locator('.content');
+  await expect
+    .poll(() => content.evaluate((element) => element.scrollHeight - element.clientHeight))
+    .toBe(0);
+});
+
+test.describe('touch appearance controls', () => {
+  test.use({ hasTouch: true });
+
+  test('opens and changes the palette by touch at the supported widths', async ({ page }) => {
+    await page.goto('/');
+    const panel = page.getByRole('dialog', { name: 'Appearance', exact: true });
+    for (const width of [320, 390, 760, 1280]) {
+      await page.setViewportSize({ width, height: 844 });
+      await page.getByRole('button', { name: 'Appearance', exact: true }).tap();
+      await panel.getByRole('button', { name: 'Ink', exact: true }).tap();
+      await expect(panel.getByRole('button', { name: 'Ink', exact: true })).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      );
+      await panel.getByRole('button', { name: 'Cancel', exact: true }).tap();
+      await expect(panel).toBeHidden();
+    }
+  });
+});
