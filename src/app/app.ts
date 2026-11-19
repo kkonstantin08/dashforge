@@ -1,5 +1,5 @@
-import { DOCUMENT } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { AppearancePreview } from './appearance/appearance-preview';
 import { Dashboard } from './dashboard/dashboard';
 import { DashboardStore } from './dashboard/dashboard-store';
 
@@ -11,9 +11,7 @@ import { DashboardStore } from './dashboard/dashboard-store';
 })
 export class App {
   constructor() {
-    const store = inject(DashboardStore);
-    const document = inject(DOCUMENT);
-    effect(() => (document.documentElement.dataset['theme'] = store.workspace().theme));
-    void store.load();
+    inject(AppearancePreview);
+    void inject(DashboardStore).load();
   }
 }

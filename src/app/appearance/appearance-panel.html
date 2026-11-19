@@ -1,0 +1,192 @@
+<dialog #dialog aria-labelledby="appearance-title" (cancel)="dismiss($event)">
+  <header>
+    <h2 id="appearance-title">Appearance</h2>
+  </header>
+
+  <div class="settings">
+    <section aria-labelledby="colors-title">
+      <div class="section-heading">
+        <h3 id="colors-title">Colors</h3>
+        <div class="segments" role="group" aria-label="Color mode">
+          <button
+            type="button"
+            [attr.aria-pressed]="theme() === 'light'"
+            (click)="theme.set('light')"
+          >
+            Light
+          </button>
+          <button
+            type="button"
+            [attr.aria-pressed]="theme() === 'dark'"
+            (click)="theme.set('dark')"
+          >
+            Dark
+          </button>
+        </div>
+      </div>
+      <div class="presets" role="group" aria-label="Palettes">
+        @for (preset of presets; track preset[0]) {
+          @let colors = preset[1][theme()];
+          <button
+            type="button"
+            [attr.aria-pressed]="samePalette(colors)"
+            (click)="choosePreset(colors)"
+          >
+            <span class="palette" aria-hidden="true">
+              <span [style.background]="colors.background"></span>
+              <span [style.background]="colors.cards"></span>
+              <span [style.background]="colors.accent"></span>
+            </span>
+            {{ preset[0] }}
+          </button>
+        }
+      </div>
+      <div class="color-fields">
+        @for (field of colorFields; track field.key) {
+          @let invalidValue = invalidColors()[theme()]?.[field.key];
+          <div class="color-field">
+            <label [for]="'color-' + field.key">{{ field.label }}</label>
+            <div>
+              <input
+                type="color"
+                [attr.aria-label]="field.label + ' color'"
+                [value]="palette()[field.key]"
+                (input)="changeColor(field.key, $event.target.value)"
+              />
+              <input
+                type="text"
+                [id]="'color-' + field.key"
+                [attr.aria-label]="field.label + ' HEX'"
+                [attr.aria-invalid]="invalidValue !== undefined ? 'true' : null"
+                [attr.aria-describedby]="
+                  invalidValue !== undefined ? 'color-error-' + field.key : null
+                "
+                autocomplete="off"
+                spellcheck="false"
+                maxlength="7"
+                [value]="invalidValue ?? palette()[field.key]"
+                (input)="changeColor(field.key, $event.target.value)"
+              />
+            </div>
+            @if (invalidValue !== undefined) {
+              <p class="widget-error" [id]="'color-error-' + field.key">
+                Use a six-digit HEX color such as #F3EEE5.
+              </p>
+            }
+          </div>
+        }
+      </div>
+    </section>
+
+    <section aria-labelledby="typography-title">
+      <h3 id="typography-title">Typography</h3>
+      <div class="font-preview">
+        <strong>Today · 09:41</strong>
+        <span>Your notes and plans</span>
+      </div>
+      @for (role of fontRoles; track role.key) {
+        <div class="font-role">
+          <label [for]="'font-' + role.key">{{ role.label }}</label>
+          <select
+            #fontChoice
+            [id]="'font-' + role.key"
+            [value]="appearance()[role.key]"
+            (change)="setAppearance(role.key, fontChoice.value)"
+          >
+            @for (font of builtins; track font[0]) {
+              <option [value]="font[0]" [selected]="appearance()[role.key] === font[0]">
+                {{ font[1] }}
+              </option>
+            }
+            @for (font of appearance().imported; track font.id) {
+              <option [value]="font.id" [selected]="appearance()[role.key] === font.id">
+                {{ font.name }}
+              </option>
+            }
+          </select>
+        </div>
+      }
+      <input type="file" #fontFile hidden accept=".woff2,.ttf,.otf" (change)="upload(fontFile)" />
+      <button type="button" #uploadButton [disabled]="uploading()" (click)="fontFile.click()">
+        {{ uploading() ? 'Opening font…' : 'Add font' }}
+      </button>
+      @if (uploadError()) {
+        <p role="alert" class="widget-error font-message">{{ uploadError() }}</p>
+      }
+      @if (appearance().imported.length) {
+        <ul class="font-list" aria-label="Imported fonts">
+          @for (font of appearance().imported; track font.id) {
+            <li>
+              <span
+                >{{ font.name }}
+                @if (failedFonts().includes(font.id)) {
+                  <small class="widget-error">Unavailable. Add the file again to replace it.</small>
+                }
+              </span>
+              <button
+                type="button"
+                [attr.aria-label]="'Remove ' + font.name"
+                (click)="removeFont(font.id); uploadButton.focus()"
+              >
+                Remove
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+
+    <section aria-labelledby="density-title">
+      <h3 id="density-title">Density</h3>
+      <div class="segments density" role="group" aria-label="Card density">
+        <button
+          type="button"
+          [attr.aria-pressed]="appearance().density === 'comfortable'"
+          (click)="setAppearance('density', 'comfortable')"
+        >
+          Comfortable
+        </button>
+        <button
+          type="button"
+          [attr.aria-pressed]="appearance().density === 'compact'"
+          (click)="setAppearance('density', 'compact')"
+        >
+          Compact
+        </button>
+      </div>
+      <label class="radius">
+        Corner radius
+        <span>
+          <input
+            type="range"
+            min="0"
+            max="24"
+            step="2"
+            [attr.aria-valuetext]="appearance().radius + ' pixels'"
+            [value]="appearance().radius"
+            (input)="setAppearance('radius', $event.target.valueAsNumber)"
+          />
+          <output>{{ appearance().radius }} px</output>
+        </span>
+      </label>
+    </section>
+  </div>
+
+  <footer>
+    @if (invalid()) {
+      <p class="widget-error" role="status">Correct the highlighted HEX values before applying.</p>
+    }
+    <div class="footer-actions">
+      <button type="button" class="reset" (click)="reset()">Reset appearance</button>
+      <button type="button" (click)="dismiss()">Cancel</button>
+      <button
+        type="button"
+        class="primary filled"
+        [disabled]="uploading() || invalid()"
+        (click)="save()"
+      >
+        Apply
+      </button>
+    </div>
+  </footer>
+</dialog>

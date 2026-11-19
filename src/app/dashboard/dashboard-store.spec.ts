@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { DEFAULT_APPEARANCE } from '../appearance/appearance';
 import { IndexedDbWorkspace, RevisionConflict } from '../storage/indexed-db';
 import { DashboardStore } from './dashboard-store';
 import { createWorkspace, type Workspace } from './workspace';
@@ -53,7 +54,7 @@ describe('workspace persistence', () => {
       .mockResolvedValue(1);
     const { store } = setup(undefined, write);
     await store.load();
-    store.setTheme('dark');
+    store.applyAppearance('dark', DEFAULT_APPEARANCE, new Map());
     const clock = store.workspace().widgets.find((widget) => widget.type === 'clock')!;
     store.place(clock.id, 'desktop', { col: 0, row: 10, width: 4, height: 2 });
     expect(store.saveState()).toBe('saving');
@@ -74,7 +75,7 @@ describe('workspace persistence', () => {
     const write = vi.fn().mockRejectedValue(new RevisionConflict());
     const { store } = setup(read, write);
     await store.load();
-    store.setTheme('dark');
+    store.applyAppearance('dark', DEFAULT_APPEARANCE, new Map());
     await vi.waitFor(() => expect(store.saveState()).toBe('conflict'));
     expect(store.workspace().theme).toBe('dark');
     await store.retrySave();
@@ -87,7 +88,7 @@ describe('workspace persistence', () => {
   it('blocks edits when reading failed', async () => {
     const { store, write } = setup(vi.fn().mockRejectedValue(new Error('Unreadable')));
     await store.load();
-    store.setTheme('dark');
+    store.applyAppearance('dark', DEFAULT_APPEARANCE, new Map());
     expect(store.saveState()).toBe('read-error');
     expect(write).not.toHaveBeenCalled();
   });

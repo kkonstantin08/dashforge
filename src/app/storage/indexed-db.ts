@@ -45,7 +45,7 @@ export class IndexedDbWorkspace {
       const request = transaction.objectStore(STORE).get(`font:${id}`);
       transaction.onabort = () => reject(transaction.error ?? new Error('Font read aborted'));
       transaction.oncomplete = () =>
-        resolve(request.result instanceof Blob ? request.result : undefined);
+        resolve(request.result instanceof ArrayBuffer ? new Blob([request.result]) : undefined);
     });
   }
 
@@ -56,6 +56,12 @@ export class IndexedDbWorkspace {
   ): Promise<number> {
     if (!isWorkspace(workspace)) throw new Error('Invalid workspace snapshot');
     const db = await this.open();
+    // WebKit may reject file-backed blobs. Read bytes before opening the transaction.
+    const assets = fonts?.additions.length
+      ? await Promise.all(
+          fonts.additions.map(async ([id, blob]) => [id, await blob.arrayBuffer()] as const),
+        )
+      : [];
     return new Promise((resolve, reject) => {
       const transaction = db.transaction(STORE, 'readwrite');
       const store = transaction.objectStore(STORE);
@@ -76,7 +82,7 @@ export class IndexedDbWorkspace {
           return;
         }
         for (const id of fonts?.removed ?? []) store.delete(`font:${id}`);
-        for (const [id, blob] of fonts?.additions ?? []) store.put(blob, `font:${id}`);
+        for (const [id, bytes] of assets) store.put(bytes, `font:${id}`);
         store.put({ schemaVersion: 1, revision, workspace } satisfies StoredWorkspace, KEY);
       };
     });

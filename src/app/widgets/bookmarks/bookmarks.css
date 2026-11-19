@@ -22,7 +22,7 @@ ul {
   margin: 4px 0 8px;
 }
 li {
-  padding-block: 3px;
+  padding-block: calc(var(--widget-gap) / 2);
 }
 a {
   flex: 1 0 120px;
@@ -42,7 +42,7 @@ a {
   display: inline-grid;
   place-items: center;
   border-radius: 6px;
-  background: var(--canvas);
+  border: 1px solid var(--border);
   color: var(--accent);
   flex: none;
   font-size: 0.8rem;

@@ -4,10 +4,12 @@
   min-width: 0;
   min-height: 0;
   position: relative;
-  padding: 16px;
-  border-radius: 16px;
+  padding: var(--tile-padding);
+  border-radius: var(--tile-radius);
   background: var(--surface);
+  color: var(--text);
   border: 1px solid var(--border);
+  box-shadow: var(--tile-shadow);
   container-type: inline-size;
 }
 :host(.selected) {
@@ -20,7 +22,7 @@
   transform: none !important;
 }
 header {
-  margin: -9px -9px 4px;
+  margin: -9px -9px var(--widget-gap);
   padding-left: 9px;
   display: flex;
   gap: 2px;
@@ -31,8 +33,7 @@ h2 {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 1rem;
-  font-weight: 600;
+  font: 600 1.0625rem/1.25 var(--heading-font);
   white-space: nowrap;
 }
 .content {
@@ -53,7 +54,7 @@ h2 {
   padding: 0;
 }
 .handle:hover {
-  background: var(--canvas);
+  background: color-mix(in srgb, var(--surface) 92%, var(--text));
 }
 .settings {
   margin-inline-start: auto;
@@ -77,6 +78,10 @@ h2 {
 
 @media (max-width: 759px) {
   :host {
-    padding: 12px;
+    padding: min(12px, var(--tile-padding));
+  }
+
+  :host-context([data-density='compact']) {
+    padding: 10px;
   }
 }

@@ -7,6 +7,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { AppearancePanel } from '../appearance/appearance-panel';
 import { WIDGETS, WIDGET_TYPES } from '../widgets/widget-registry';
 import { DashboardStore } from './dashboard-store';
 import { GridGesture, PLACEMENT_ERRORS } from './grid-gesture';
@@ -17,7 +18,7 @@ import type { View, Widget, WidgetType } from './workspace';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CdkDrag, WidgetCard, WidgetInspector],
+  imports: [CdkDrag, WidgetCard, WidgetInspector, AppearancePanel],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -32,6 +33,7 @@ export class Dashboard {
   protected readonly widgets = WIDGETS;
   protected readonly types = WIDGET_TYPES;
   protected readonly editing = signal(false);
+  protected readonly appearanceOpen = signal(false);
   protected readonly message = signal('');
   protected readonly view = signal<View>(window.innerWidth < 760 ? 'mobile' : 'desktop');
   protected readonly columns = computed(() => GRID[this.view()].columns);
@@ -67,6 +69,18 @@ export class Dashboard {
     this.gesture.cancel();
     this.editing.update((active) => !active);
     this.message.set('');
+  }
+
+  protected openAppearance(): void {
+    this.gesture.cancel();
+    this.selectedId.set(null);
+    this.anchor = undefined;
+    this.appearanceOpen.set(true);
+  }
+
+  protected closeAppearance(anchor: HTMLElement): void {
+    this.appearanceOpen.set(false);
+    requestAnimationFrame(() => anchor.focus());
   }
 
   protected select(widget: Widget, anchor: HTMLElement): void {

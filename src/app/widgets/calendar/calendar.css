@@ -1,6 +1,6 @@
 .calendar {
   display: grid;
-  gap: 16px;
+  gap: calc(var(--widget-gap) * 2);
 }
 .month-bar {
   display: flex;
@@ -37,7 +37,7 @@ h3 {
   border-color: transparent;
 }
 .calendar-grid button:hover {
-  background: var(--canvas);
+  border-color: var(--accent);
 }
 .calendar-grid button[aria-current='date'] {
   text-decoration: underline;
@@ -45,9 +45,9 @@ h3 {
 }
 .calendar-grid button[aria-pressed='true'] {
   border-color: var(--accent);
-  color: var(--accent);
+  color: var(--on-accent);
   font-weight: 600;
-  background: var(--canvas);
+  background: var(--accent);
 }
 .weekday {
   overflow: hidden;
@@ -59,7 +59,7 @@ h3 {
   min-width: 0;
   display: grid;
   align-content: start;
-  gap: 16px;
+  gap: calc(var(--widget-gap) * 2);
 }
 .agenda section + section {
   border-top: 1px solid var(--border);

@@ -2,20 +2,20 @@
   <h1 #toolbarTitle tabindex="-1">DashForge</h1>
   <div class="actions">
     @if (store.canEdit()) {
-      <button type="button" class="primary" (click)="message.set(''); catalog.showModal()">
-        Add Widget
-      </button>
+      <button #appearanceButton type="button" (click)="openAppearance()">Appearance</button>
       <button type="button" (click)="toggleEditor()">
         {{ editing() ? 'Done' : 'Edit Layout' }}
       </button>
-      <button
-        type="button"
-        (click)="store.setTheme(store.workspace().theme === 'dark' ? 'light' : 'dark')"
-      >
-        {{ store.workspace().theme === 'dark' ? 'Light theme' : 'Dark theme' }}
-      </button>
       @if (editing()) {
         <button type="button" (click)="reset()">Reset Layout</button>
+      }
+      <button type="button" class="primary filled" (click)="message.set(''); catalog.showModal()">
+        Add Widget
+      </button>
+      @if (appearanceOpen()) {
+        @defer (on immediate) {
+          <app-appearance-panel (closed)="closeAppearance(appearanceButton)" />
+        }
       }
     }
   </div>

@@ -73,11 +73,6 @@ export class DashboardStore {
     }
   }
 
-  setTheme(theme: Theme): void {
-    const current = this.model();
-    if (current.theme !== theme) this.change({ ...current, theme });
-  }
-
   applyAppearance(
     theme: Theme,
     appearance: Appearance,

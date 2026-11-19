@@ -20,12 +20,22 @@
 }
 
 .toolbar {
-  margin-bottom: 24px;
+  margin-bottom: 16px;
+  padding-block-end: 12px;
+  border-bottom: 1px solid var(--grid-line);
 }
 .toolbar h1 {
   margin: 0;
-  font-size: 1.25rem;
-  letter-spacing: -0.04em;
+  font: 600 clamp(1.35rem, 3vw, 2rem)/1.1 var(--heading-font);
+  letter-spacing: -0.025em;
+}
+.actions > button {
+  --focus: var(--canvas-accent);
+}
+.actions > .filled {
+  background: var(--canvas-accent);
+  border-color: var(--canvas-accent);
+  color: var(--canvas-on-accent);
 }
 .board {
   position: relative;
@@ -37,6 +47,7 @@
 
 .dialog-header h2 {
   margin: 0;
+  font-family: var(--heading-font);
   font-size: 1rem;
 }
 
@@ -71,19 +82,19 @@ main {
 }
 .board.editing {
   background-image:
-    linear-gradient(to right, var(--border) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--border) 1px, transparent 1px);
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
   background-size: calc((100% + 12px) / var(--columns)) 60px;
 }
 .placement-preview {
   position: absolute;
   z-index: 3;
   pointer-events: none;
-  border: 2px dashed var(--accent);
-  border-radius: 16px;
+  border: 2px dashed var(--canvas-accent);
+  border-radius: var(--tile-radius);
   padding: 6px 8px;
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
-  color: var(--accent);
+  background: color-mix(in srgb, var(--canvas-accent) 10%, transparent);
+  color: var(--canvas-accent);
   font-size: 0.875rem;
 }
 .placement-preview[data-state]:not([data-state='ok']) {
