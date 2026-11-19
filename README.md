@@ -1,6 +1,6 @@
 # DashForge
 
-[Open DashForge](https://kkonstantin08.github.io/dashforge/) · [Performance results](docs/performance.md) · [CI](https://github.com/kkonstantin08/dashforge/actions/workflows/ci.yml)
+[Open DashForge](https://kkonstantin08.github.io/dashforge/) · [Performance results](docs/performance.md) · [Final audit](docs/audits/final-gpt6-luna-high.md) · [CI](https://github.com/kkonstantin08/dashforge/actions/workflows/ci.yml)
 
 DashForge is a local-first start page for links, notes, time zones, and calendar events. Add only the widgets you use, arrange them on a grid, and the browser restores your workspace the next time you open it.
 
