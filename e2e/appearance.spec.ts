@@ -161,6 +161,15 @@ test('cycles keyboard focus in the panel and draws usable outlines on opposite s
   const cardButton = page.getByRole('button', { name: 'Clock settings' });
   await cardButton.focus();
   await expect(cardButton).toHaveCSS('outline-color', 'rgb(0, 0, 0)');
+
+  await page.keyboard.press('Enter');
+  const remove = page.getByRole('button', { name: 'Remove widget', exact: true });
+  await remove.focus();
+  await page.keyboard.press('Enter');
+  const title = page.getByRole('heading', { name: 'DashForge', exact: true });
+  await expect(title).toBeFocused();
+  await expect(title).toHaveCSS('outline-style', 'solid');
+  await expect(title).not.toHaveCSS('outline-color', 'rgb(0, 0, 0)');
 });
 
 test('the default clock fits inside its card content', async ({ page }) => {

@@ -29,7 +29,8 @@
   font: 600 clamp(1.35rem, 3vw, 2rem)/1.1 var(--heading-font);
   letter-spacing: -0.025em;
 }
-.actions > button {
+.actions > button,
+.toolbar h1 {
   --focus: var(--canvas-accent);
 }
 .actions > .filled {
