@@ -102,6 +102,6 @@ export function resetLayout(workspace: Workspace): Workspace | null {
     if (!target) return null;
     desktop[id] = target;
   }
-  const reset = { theme: workspace.theme, widgets: workspace.widgets, desktop };
+  const reset = { ...workspace, desktop, mobile: undefined };
   return usedRows(projectMobile(reset)) <= GRID.mobile.rows ? reset : null;
 }

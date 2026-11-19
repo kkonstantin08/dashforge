@@ -14,6 +14,34 @@ function setup(read = vi.fn().mockResolvedValue(null), write = vi.fn().mockResol
 describe('workspace persistence', () => {
   afterEach(() => vi.useRealTimers());
 
+  it('retries the appearance snapshot with its font and retains it after layout reset', async () => {
+    const { store, write } = setup();
+    write.mockRejectedValueOnce(new Error('Quota exceeded'));
+    await store.load();
+    const id = crypto.randomUUID();
+    const blob = new Blob(['test asset']);
+    const palette = { background: '#F3EEE5', cards: '#FFFDF8', accent: '#98492E' };
+    const appearance = {
+      palettes: { light: palette, dark: palette },
+      headings: id,
+      body: 'system',
+      imported: [{ id, name: 'Local font' }],
+      density: 'compact' as const,
+      radius: 20,
+    };
+    store.applyAppearance('dark', appearance, new Map([[id, blob]]));
+    await vi.waitFor(() => expect(store.saveState()).toBe('write-error'));
+    await store.retrySave();
+    expect(write.mock.lastCall).toEqual([
+      expect.objectContaining({ theme: 'dark', appearance }),
+      0,
+      { additions: [[id, blob]], removed: [] },
+    ]);
+    expect(store.resetLayout()).toBe('ok');
+    expect(store.workspace().appearance).toBe(appearance);
+    expect(write.mock.lastCall).toHaveLength(2);
+  });
+
   it('retains the newest whole snapshot when a write fails', async () => {
     let rejectWrite!: (reason: Error) => void;
     const firstWrite = new Promise<number>((_, reject) => {

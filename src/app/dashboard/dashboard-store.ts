@@ -1,4 +1,5 @@
 import { computed, DestroyRef, inject, Injectable, signal } from '@angular/core';
+import type { Appearance } from '../appearance/appearance';
 import { IndexedDbWorkspace, RevisionConflict } from '../storage/indexed-db';
 import { WIDGETS } from '../widgets/widget-registry';
 import {
@@ -38,6 +39,7 @@ export class DashboardStore {
   private readonly state = signal<SaveState>('ready');
   private revision = 0;
   private persisted = this.model();
+  private readonly pendingFonts = new Map<string, Blob>();
   private timer?: ReturnType<typeof setTimeout>;
   private writing = false;
   private destroyed = false;
@@ -63,6 +65,7 @@ export class DashboardStore {
       if (this.destroyed) return;
       this.revision = stored?.revision ?? 0;
       this.persisted = stored?.workspace ?? createWorkspace(systemTheme());
+      this.pendingFonts.clear();
       this.model.set(this.persisted);
       this.state.set(stored ? 'saved' : 'ready');
     } catch {
@@ -73,6 +76,22 @@ export class DashboardStore {
   setTheme(theme: Theme): void {
     const current = this.model();
     if (current.theme !== theme) this.change({ ...current, theme });
+  }
+
+  applyAppearance(
+    theme: Theme,
+    appearance: Appearance,
+    additions: ReadonlyMap<string, Blob>,
+  ): void {
+    if (!this.canEdit()) return;
+    const ids = new Set(appearance.imported.map(({ id }) => id));
+    for (const id of this.pendingFonts.keys()) if (!ids.has(id)) this.pendingFonts.delete(id);
+    for (const [id, blob] of additions) if (ids.has(id)) this.pendingFonts.set(id, blob);
+    this.change({ ...this.model(), theme, appearance });
+  }
+
+  async readFont(id: string): Promise<Blob | undefined> {
+    return this.pendingFonts.get(id) ?? this.storage.readFont(id);
   }
 
   getWidget<K extends WidgetType>(id: string, type: K): Extract<Widget, { type: K }> | undefined {
@@ -115,7 +134,16 @@ export class DashboardStore {
     this.writing = true;
     this.state.set('saving');
     try {
-      this.revision = await this.storage.write(snapshot, this.revision);
+      const currentIds = new Set(snapshot.appearance?.imported.map(({ id }) => id));
+      const previousIds = new Set(this.persisted.appearance?.imported.map(({ id }) => id));
+      const additions = [...this.pendingFonts].filter(
+        ([id]) => currentIds.has(id) && !previousIds.has(id),
+      );
+      const removed = [...previousIds].filter((id) => !currentIds.has(id));
+      this.revision = await (additions.length || removed.length
+        ? this.storage.write(snapshot, this.revision, { additions, removed })
+        : this.storage.write(snapshot, this.revision));
+      for (const [id] of additions) this.pendingFonts.delete(id);
       this.persisted = snapshot;
       if (!this.destroyed && this.model() === snapshot) this.state.set('saved');
     } catch (error) {

@@ -7,6 +7,8 @@ const KEY = 'workspace';
 
 export class RevisionConflict extends Error {}
 
+export type FontChanges = { additions: [id: string, blob: Blob][]; removed: string[] };
+
 @Injectable({ providedIn: 'root' })
 export class IndexedDbWorkspace {
   private connection?: Promise<IDBDatabase>;
@@ -36,7 +38,22 @@ export class IndexedDbWorkspace {
     });
   }
 
-  async write(workspace: Workspace, expectedRevision: number): Promise<number> {
+  async readFont(id: string): Promise<Blob | undefined> {
+    const db = await this.open();
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction(STORE, 'readonly');
+      const request = transaction.objectStore(STORE).get(`font:${id}`);
+      transaction.onabort = () => reject(transaction.error ?? new Error('Font read aborted'));
+      transaction.oncomplete = () =>
+        resolve(request.result instanceof Blob ? request.result : undefined);
+    });
+  }
+
+  async write(
+    workspace: Workspace,
+    expectedRevision: number,
+    fonts?: FontChanges,
+  ): Promise<number> {
     if (!isWorkspace(workspace)) throw new Error('Invalid workspace snapshot');
     const db = await this.open();
     return new Promise((resolve, reject) => {
@@ -58,6 +75,8 @@ export class IndexedDbWorkspace {
           transaction.abort();
           return;
         }
+        for (const id of fonts?.removed ?? []) store.delete(`font:${id}`);
+        for (const [id, blob] of fonts?.additions ?? []) store.put(blob, `font:${id}`);
         store.put({ schemaVersion: 1, revision, workspace } satisfies StoredWorkspace, KEY);
       };
     });

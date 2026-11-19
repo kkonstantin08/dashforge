@@ -1,3 +1,4 @@
+import { BUILTIN_FONTS, FONT_ID, HEX_COLOR, MAX_FONTS } from '../appearance/appearance';
 import {
   GRID,
   limitsFor,
@@ -106,6 +107,7 @@ function validLayout(layout: unknown, widgets: Widget[], view: View): boolean {
 
 export function isWorkspace(value: unknown): value is Workspace {
   if (!isRecord(value) || (value['theme'] !== 'light' && value['theme'] !== 'dark')) return false;
+  if (value['appearance'] !== undefined && !validAppearance(value['appearance'])) return false;
   const widgets = value['widgets'];
   if (
     !Array.isArray(widgets) ||
@@ -117,6 +119,45 @@ export function isWorkspace(value: unknown): value is Workspace {
   return value['mobile'] === undefined
     ? usedRows(projectMobile(value as Workspace)) <= GRID.mobile.rows
     : validLayout(value['mobile'], widgets, 'mobile');
+}
+
+function validAppearance(value: unknown): boolean {
+  if (!isRecord(value)) return false;
+  const { palettes, imported, headings, body, density, radius } = value;
+  if (
+    !isRecord(palettes) ||
+    !['light', 'dark'].every((theme) => {
+      const palette = palettes[theme];
+      return (
+        isRecord(palette) &&
+        ['background', 'cards', 'accent'].every((name) => {
+          const color = palette[name];
+          return text(color) && HEX_COLOR.test(color);
+        })
+      );
+    }) ||
+    !Array.isArray(imported) ||
+    imported.length > MAX_FONTS ||
+    !entries(
+      imported,
+      ({ id, name }) =>
+        text(id) && FONT_ID.test(id) && text(name) && name.length > 0 && name.length <= 255,
+    )
+  )
+    return false;
+
+  return (
+    (density === 'comfortable' || density === 'compact') &&
+    typeof radius === 'number' &&
+    radius >= 0 &&
+    radius <= 24 &&
+    radius % 2 === 0 &&
+    [headings, body].every(
+      (font) =>
+        text(font) &&
+        (Object.hasOwn(BUILTIN_FONTS, font) || imported.some((entry) => entry.id === font)),
+    )
+  );
 }
 
 export function isStoredWorkspace(value: unknown): value is StoredWorkspace {

@@ -9,6 +9,33 @@ describe('persisted workspace schema', () => {
     expect(isStoredWorkspace({ ...record, schemaVersion: 2 })).toBe(false);
   });
 
+  it('accepts appearance metadata in a v1 snapshot and rejects references to unknown fonts', () => {
+    const palette = { background: '#F3EEE5', cards: '#FFFDF8', accent: '#98492E' };
+    const appearance = {
+      palettes: { light: palette, dark: palette },
+      headings: 'lora',
+      body: 'system',
+      imported: [],
+      density: 'comfortable',
+      radius: 18,
+    };
+    const workspace = { ...createWorkspace('dark'), appearance };
+    const record = { schemaVersion: 1, revision: 1, workspace };
+    expect(isStoredWorkspace(record)).toBe(true);
+    expect(
+      isStoredWorkspace({
+        ...record,
+        workspace: { ...workspace, appearance: { ...appearance, body: crypto.randomUUID() } },
+      }),
+    ).toBe(false);
+    expect(
+      isStoredWorkspace({
+        ...record,
+        workspace: { ...workspace, appearance: { ...appearance, radius: -18 } },
+      }),
+    ).toBe(false);
+  });
+
   it('rejects corrupt positions and duplicate identifiers', () => {
     const workspace = createWorkspace('light');
     const [clock, bookmarks] = workspace.widgets;

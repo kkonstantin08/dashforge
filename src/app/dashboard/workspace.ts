@@ -1,3 +1,4 @@
+import type { Appearance } from '../appearance/appearance';
 import { WIDGETS, WIDGET_TYPES } from '../widgets/widget-registry';
 import type { Positions } from './layout';
 
@@ -18,7 +19,13 @@ export type WidgetType = keyof WidgetData;
 export type Widget<K extends WidgetType = WidgetType> = {
   [T in K]: { id: string; type: T; data: WidgetData[T] };
 }[K];
-export type Workspace = { theme: Theme; widgets: Widget[]; desktop: Positions; mobile?: Positions };
+export type Workspace = {
+  theme: Theme;
+  widgets: Widget[];
+  desktop: Positions;
+  mobile?: Positions;
+  appearance?: Appearance;
+};
 
 export function createWidget(type: WidgetType): Widget {
   const id = crypto.randomUUID();
