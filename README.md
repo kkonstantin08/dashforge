@@ -4,15 +4,17 @@
 
 DashForge is a local-first start page for links, notes, time zones, and calendar events. Add only the widgets you use, arrange them on a grid, and the browser restores your workspace the next time you open it.
 
-![DashForge in the light theme with a clock, grouped bookmarks, notes, and calendar](docs/images/dashboard-light.png)
+![DashForge in the Warm Studio light palette with a clock, bookmarks, notes, and calendar](docs/images/warm-studio-workspace.png)
 
-[Dark theme and widget inspector](docs/images/editor-dark.png) · [Mobile layout](docs/images/dashboard-mobile.png)
+[Appearance editor](docs/images/warm-studio-appearance.png) · [Mobile dark theme](docs/images/warm-studio-mobile.png)
 
 ## What you can do
 
 - Add multiple instances of any widget. Drag cards to free cells, resize them, or enter exact positions and sizes in the widget inspector.
 - Use different time zones and time formats for each clock. Group links, write plain-text notes, and manage local calendar events.
-- Switch between light and dark themes. Edit the narrow-screen layout separately when you need a different arrangement on your phone.
+- Preview palettes, custom colors, tile density, and corner radius in the Appearance editor. Light and dark palettes save separately.
+- Choose heading and body fonts independently. Import WOFF2, TTF, or OTF files and keep them in your browser.
+- Edit the narrow-screen layout separately when you need a different arrangement on your phone.
 - Move and resize widgets from the keyboard through the inspector. Reset positions and sizes while keeping the same widgets and content.
 - Keep workspaces in IndexedDB. DashForge uses static hosting and requires no account.
 
@@ -51,6 +53,7 @@ Angular standalone components use Signals, OnPush, and zoneless change detection
 
 ```text
 src/app/dashboard/   editor, grid rules, inspector, and workspace state
+src/app/appearance/  palette contrast, local fonts, and the lazy editor
 src/app/widgets/     clock, bookmarks, notes, calendar, and lazy registry
 src/app/storage/     snapshot validation and IndexedDB transactions
 e2e/                 browser tests and viewport checks
@@ -63,7 +66,7 @@ The release baseline measures initial JS and CSS, time to the first populated gr
 
 ## MVP limits
 
-One workspace per origin and browser profile, with a separate narrow-screen arrangement if you customize it. The dashboard stores data on that device. Clearing the browser's site data clears the workspace. Bookmarks use local icons. Calendar events are local and can be edited without an external calendar.
+One workspace per origin and browser profile, with a separate narrow-screen arrangement if you customize it. Each workspace can keep six imported fonts up to 5 MiB per file. Clearing the browser's site data clears the workspace and its fonts. Bookmarks use local icons. Calendar events are local and can be edited without an external calendar.
 
 ## Roadmap
 

@@ -18,18 +18,19 @@
 
 ## 1. Workspace schema and storage
 
-- [ ] RED. Add tests to `src/app/storage/indexed-db.spec.ts` for optional metadata and invalid references, and to `src/app/dashboard/dashboard-store.spec.ts` for atomic font changes after a failed write and preservation on layout reset.
-- [ ] GREEN. Add `Appearance`, its default values and validation in `src/app/appearance/appearance.ts`. Extend `Workspace`, `isWorkspace` and `resetLayout`. Add `IndexedDbWorkspace.readFont(id)` and an optional `FontChanges` argument to `write`. Compute the asset delta for the snapshot in `DashboardStore.applyAppearance(theme, appearance, additions)` and its existing queue.
-- [ ] REFACTOR. Keep normal workspace saves on the same transaction path without asset reads or writes. Verify TestBed and typecheck. Commit `feat(storage): persist appearance and font assets`.
+- [x] RED. Add schema tests for optional metadata and invalid references and TestBed tests for failed writes and layout reset.
+- [x] GREEN. Extend the workspace and its write queue. Process font changes in the snapshot transaction.
+- [x] REFACTOR. Keep normal workspace saves on the same path without asset reads or writes. `2d07615`.
 
 ## 2. Presentation and editor
 
-- [ ] RED. Write color unit tests and Playwright acceptance scenarios for live preview, save and cancel, uploads, removal and reload. Move existing theme E2E actions to the approved control location.
-- [ ] GREEN. Add `appearance-colors.ts`, `appearance-preview.ts`, `local-font.ts`, and the deferred native dialog in `appearance-panel.*`. Use root variables for color, typography, radius and density. Add licensed same-origin Lora and update shell and widget CSS. The typography roles use built-in names or a validated local asset ID.
-- [ ] REFACTOR. Serve selected font faces only, unregister unused faces, and keep cosmetics out of layout data. Verify selected browsers and the production budget. Commit `feat(ui): add Warm Studio appearance editor`.
+- [x] RED. Add color unit tests and browser tests for live preview, cancel, apply, import, removal and reload.
+- [x] GREEN. Add the deferred Appearance dialog, CSS variables and licensed same-origin Lora. Verify Chromium and WebKit.
+- [x] REFACTOR. Serve selected faces and unregister unused faces. Keep appearance out of layout geometry. `89f51a4`.
 
 ## 3. Acceptance and release
 
-- [ ] Verify lint, formatting, strict typecheck, unit tests, production build, full Playwright suite, and the twenty-widget benchmark. Capture actual desktop and phone-width screenshots.
-- [ ] Review the complete branch independently, resolve important findings with RED → GREEN, and document the acceptance evidence, performance and guide. Commit the release documentation separately.
-- [ ] Publish and verify GitHub Actions, Pages, settings restore and local import on the public origin. Schedule the portfolio motion work after the redesign is released.
+- [x] Verify lint, formatting, strict typecheck, unit tests, production build, full Playwright suite, and the twenty-widget benchmark. Capture desktop and phone-width screenshots.
+- [x] Review the complete branch independently, resolve findings with RED → GREEN and document the evidence. `d2cc570`. [TDD](../tdd/warm-studio.md) · [Acceptance](../audits/warm-studio.md)
+
+GitHub Actions publishes the main branch through Pages. Verify the deployment against its current SHA and rerun the appearance, font and restore smoke on the public origin. [CI and Pages](https://github.com/kkonstantin08/dashforge/actions/workflows/ci.yml)
